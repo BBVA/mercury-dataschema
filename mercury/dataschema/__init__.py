@@ -1,0 +1,1 @@
+from .schemagen import DataSchema
