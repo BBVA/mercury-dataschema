@@ -1,6 +1,7 @@
 # mercury-dataschema
 
 [![](https://github.com/BBVA/mercury-dataschema/actions/workflows/test.yml/badge.svg)](https://github.com/BBVA/mercury-dataschema)
+![](https://img.shields.io/badge/latest-0.0.1-blue)
 
 `mercury-dataschema` is a submodule of the Mercury library which acts as a utility tool that, given a Pandas DataFrame, its `DataSchema` class auto-infers feature types and automatically calculates different statistics depending on them.
 
