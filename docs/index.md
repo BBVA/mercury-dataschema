@@ -10,7 +10,7 @@ This package is used by other Mercury submodules, and you also can use it separa
 
 As an idea (there are plenty of them, though), it is particularly useful when preprocessing datasets. Having to specify the typical `categorical_cols` and `coninuous_cols` is over!
 
-## Example
+## Usage example
 
 ```python
 from mercury.dataschema.schemagen import DataSchema

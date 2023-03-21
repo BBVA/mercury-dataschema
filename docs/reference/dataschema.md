@@ -1,0 +1,3 @@
+# Data Schema
+
+::: mercury.dataschema
