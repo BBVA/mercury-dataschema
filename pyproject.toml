@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mercury-dataschema"
+license = {file = "LICENSE.txt"}
+version = "0.0.1"
+authors = [
+  { name="Mercury Team", email="mercury.group@bbva.com" },
+]
+description = "Mercury's DataSchema package allows the automatic recognition and validation of feature types."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  'numpy',
+  'cryptography'
+]
+
+[project.optional-dependencies]
+dev = [
+  'seaborn',
+  'pytest',
+  'flake8',
+]
+doc = [
+  'mkdocs',
+  'mkdocstrings[python]',
+  'mkdocs-material',
+  'mkdocs-minify-plugin==0.5.0',
+  'mkdocs-exclude',
+  'nbconvert',
+]
+
+[project.urls]
+"Homepage" = "https://github.com/BBVA/mercury-dataschema"
+"Bug Tracker" = "https://github.com/BBVA/mercury-dataschema/issues"
