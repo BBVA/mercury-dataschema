@@ -11,6 +11,19 @@ This package is used by other Mercury submodules, and you also can use it separa
 
 As an idea (there are plenty of them, though), it is particularly useful when preprocessing datasets. Having to specify the typical `categorical_cols` and `coninuous_cols` is over!
 
+## Mercury project at BBVA
+
+Mercury is a collaborative library that was developed by the Advanced Analytics community at BBVA. Originally, it was created as an [InnerSource](https://en.wikipedia.org/wiki/Inner_source) project but after some time, we decided to release certain parts of the project as Open Source.
+That's the case with the `mercury-dataschema` package. 
+
+If you're interested in learning more about the Mercury project, we recommend reading this blog [post](https://www.bbvaaifactory.com/mercury-acelerando-la-reutilizacion-en-ciencia-de-datos-dentro-de-bbva/) from www.bbvaaifactory.com
+
+## User installation
+
+The easiest way to install `mercury-dataschema` is using ``pip``:
+
+    pip install -U mercury-dataschema
+
 ## Example
 
 ```python
@@ -166,3 +179,13 @@ schma.save(PATH)
 # Load it back!
 recovered = DataSchema.load(PATH)
 ```
+
+## Help and support 
+
+This library is currently maintained by a dedicated team of data scientists and machine learning engineers from BBVA AI Factory. 
+
+### Documentation
+website: https://bbva.github.io/mercury-dataschema/
+
+### Email 
+mercury.group@bbva.com
