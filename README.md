@@ -1,20 +1,20 @@
 # mercury-dataschema
 
 [![](https://github.com/BBVA/mercury-dataschema/actions/workflows/test.yml/badge.svg)](https://github.com/BBVA/mercury-dataschema)
-![](https://img.shields.io/badge/latest-0.0.1-blue)
+![](https://img.shields.io/badge/latest-1.1.2-blue)
 
 `mercury-dataschema` is a submodule of the Mercury library which acts as a utility tool that, given a Pandas DataFrame, its `DataSchema` class auto-infers feature types and automatically calculates different statistics depending on them.
 
 This type inference isn't solely based on data types but in the information the variables contain. For example: if a feature is encoded as a `float` but its cardinality is 2, we can be sure it's a binary feature.
 
-This package is used by other Mercury submodules, and you also can use it separately from the rest of the library. 
+This package is used by other Mercury submodules, and you also can use it separately from the rest of the library.
 
 As an idea (there are plenty of them, though), it is particularly useful when preprocessing datasets. Having to specify the typical `categorical_cols` and `coninuous_cols` is over!
 
 ## Mercury project at BBVA
 
 Mercury is a collaborative library that was developed by the Advanced Analytics community at BBVA. Originally, it was created as an [InnerSource](https://en.wikipedia.org/wiki/Inner_source) project but after some time, we decided to release certain parts of the project as Open Source.
-That's the case with the `mercury-dataschema` package. 
+That's the case with the `mercury-dataschema` package.
 
 If you're interested in learning more about the Mercury project, we recommend reading this blog [post](https://www.bbvaaifactory.com/mercury-acelerando-la-reutilizacion-en-ciencia-de-datos-dentro-de-bbva/) from www.bbvaaifactory.com
 
@@ -30,7 +30,7 @@ The easiest way to install `mercury-dataschema` is using ``pip``:
 from mercury.dataschema.schemagen import DataSchema
 from mercury.dataschema.feature import FeatType
 
-dataset = UCIDataset().load()   # Any Dataframe 
+dataset = UCIDataset().load()   # Any Dataframe
 
 schma = (DataSchema()         # Generate a lazy Schema object
     .generate(dataset)        # Manually trigger its construction (it mostly infers data types...)
@@ -180,12 +180,12 @@ schma.save(PATH)
 recovered = DataSchema.load(PATH)
 ```
 
-## Help and support 
+## Help and support
 
-This library is currently maintained by a dedicated team of data scientists and machine learning engineers from BBVA. 
+This library is currently maintained by a dedicated team of data scientists and machine learning engineers from BBVA.
 
 ### Documentation
 website: https://bbva.github.io/mercury-dataschema/
 
-### Email 
+### Email
 mercury.group@bbva.com
