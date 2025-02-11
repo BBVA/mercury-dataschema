@@ -2,6 +2,14 @@
 
 [![](https://github.com/BBVA/mercury-dataschema/actions/workflows/test.yml/badge.svg)](https://github.com/BBVA/mercury-dataschema)
 ![](https://img.shields.io/badge/latest-1.1.2-blue)
+[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3816/)
+[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-3916/)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-31011/)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3119/)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3128/)
+[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3131/)
+[![Apache 2 license](https://shields.io/badge/license-Apache%202-blue)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](https://github.com/BBVA/mercury-dataschema/issues)
 
 `mercury-dataschema` is a submodule of the Mercury library which acts as a utility tool that, given a Pandas DataFrame, its `DataSchema` class auto-infers feature types and automatically calculates different statistics depending on them.
 
@@ -165,6 +173,14 @@ schma.feats['default.payment.next.month'].stats
  'distribution': [0.7788, 0.2212],
  'distribution_bins': [0, 1],
  'domain': [1, 0]}
+```
+
+## Example notebooks
+
+```python
+from mercury.dataschema import create_tutorials
+
+create_tutorials('.')	# Creates a folder with example notebooks in the current path.
 ```
 
 ## Saving and loading schemas
