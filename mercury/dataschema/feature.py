@@ -84,8 +84,8 @@ class BinaryFeature(Feature):
     (i.e. only two possible values).
 
     Args:
-        name: Feature name
-        dtype: Data type of the feature
+        name (str): Feature name
+        dtype (str): Data type of the feature
     """
     def __init__(self,
                  name=None,
@@ -115,8 +115,8 @@ class CategoricalFeature(Feature):
     (i.e. only N possible values).
 
     Args:
-        name: Feature name
-        dtype: Data type of the feature
+        name (str): Feature name
+        dtype (str): Data type of the feature
     """
     def __init__(self,
                  name=None,
@@ -164,8 +164,8 @@ class DiscreteFeature(Feature):
     (i.e. any number without decimals).
 
     Args:
-        name: Feature name
-        dtype: Data type of the feature
+        name (str): Feature name
+        dtype (str): Data type of the feature
     """
     def __init__(self,
                  name=None,
@@ -196,8 +196,8 @@ class ContinuousFeature(Feature):
     (e.g. a float).
 
     Args:
-        name: Feature name
-        dtype: Data type of the feature
+        name (str): Feature name
+        dtype (str): Data type of the feature
     """
     def __init__(self,
                  name=None,
