@@ -1,0 +1,3 @@
+graft mercury/dataschema/
+
+recursive-include mercury/dataschema/tutorials *
