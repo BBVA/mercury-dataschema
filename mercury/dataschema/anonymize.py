@@ -107,7 +107,7 @@ class Anonymize:
     def anonymize_list_any_type(self, list_of_any):
         """Anonymize a list of anything that supports conversion to string.
 
-        This is a wrapper function over anonymize_list(). It verifies is any element in the list is
+        This is a wrapper function over anonymize_list(). It verifies if any element in the list is
         not a string first. If all elements are strings, it passes the list to anonymize_list().
         Otherwise, it creates a new list of string elements and passes that to anonymize_list().
 

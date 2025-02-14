@@ -38,7 +38,7 @@ class Feature:
         self.stats = {}
         self.cache = {}  # Intermediate heavy calculations
 
-    def build_stats(self, column, calculator=None):
+    def build_stats(self, column, calculator = None):
         no_nan_col = column.dropna()
         uniques = no_nan_col.unique()
         self.stats['num_nan'] = int(column.isna().sum())
@@ -87,17 +87,14 @@ class BinaryFeature(Feature):
         name (str): Feature name
         dtype (str): Data type of the feature
     """
-    def __init__(self,
-                 name=None,
-                 dtype=None
-                 ):
+    def __init__(self, name = None, dtype = None                 ):
 
         super().__init__(name, dtype)
 
     def build_stats(self, column, calculator):
         super().build_stats(column, calculator)
         self.stats['domain'] = self.cache['uniques']
-        calculator.distribution(column, self, bins=2)
+        calculator.distribution(column, self, bins = 2)
         return self
 
     def __str__(self):
@@ -118,10 +115,7 @@ class CategoricalFeature(Feature):
         name (str): Feature name
         dtype (str): Data type of the feature
     """
-    def __init__(self,
-                 name=None,
-                 dtype=None
-                 ):
+    def __init__(self, name = None, dtype = None):
 
         super().__init__(name, dtype)
 
@@ -167,10 +161,7 @@ class DiscreteFeature(Feature):
         name (str): Feature name
         dtype (str): Data type of the feature
     """
-    def __init__(self,
-                 name=None,
-                 dtype=None
-                 ):
+    def __init__(self, name = None, dtype = None):
 
         super().__init__(name, dtype)
 
@@ -199,10 +190,7 @@ class ContinuousFeature(Feature):
         name (str): Feature name
         dtype (str): Data type of the feature
     """
-    def __init__(self,
-                 name=None,
-                 dtype=None
-                 ):
+    def __init__(self, name = None, dtype = None):
 
         super().__init__(name, dtype)
 
@@ -279,7 +267,7 @@ class FeatureFactory:
 
         return feat
 
-    def _infer_feature_type_from_float(self, feat, threshold_categorical, colname, verbose=False):
+    def _infer_feature_type_from_float(self, feat, threshold_categorical, colname, verbose = False):
         if (feat.cache['no_nan_filtered'] % 1 == 0).all():  # The float column doesn't contain decimals
             if (feat.stats['percent_unique'] < threshold_categorical):
                 # Case Categorical as float
@@ -298,7 +286,7 @@ class FeatureFactory:
         # codified as floats with decimals
         return FeatType.CONTINUOUS
 
-    def _infer_feature_type_from_int(self, feat, colname, threshold_categorical, verbose=False):
+    def _infer_feature_type_from_int(self, feat, threshold_categorical, colname, verbose = False):
         if feat.stats['percent_unique'] >= threshold_categorical:
             return FeatType.DISCRETE
         else:
@@ -349,10 +337,10 @@ class FeatureFactory:
         else:
             # Data could still be either categorical, discrete or continuous
             if datatype is DataType.FLOAT:
-                feat_type = self._infer_feature_type_from_float(feat, threshold_categorical, colname, verbose=verbose)
+                feat_type = self._infer_feature_type_from_float(feat, threshold_categorical, colname, verbose = verbose)
 
             if datatype is DataType.INTEGER:
-                feat_type = self._infer_feature_type_from_int(feat, colname, threshold_categorical, verbose=verbose)
+                feat_type = self._infer_feature_type_from_int(feat, threshold_categorical, colname, verbose = verbose)
 
             if (datatype is DataType.STRING) or (datatype is DataType.CATEGORICAL):
                 feat_type = FeatType.CATEGORICAL
