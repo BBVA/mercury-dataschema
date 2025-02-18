@@ -185,7 +185,7 @@ recovered = DataSchema.load(PATH)
 This library is currently maintained by a dedicated team of data scientists and machine learning engineers from BBVA AI Factory.
 
 ### Documentation
-website: https://bbva.github.io/mercury-dataschema/
+website: https://bbva.github.io/mercury-dataschema/site/
 
 ### Email
 mercury.group@bbva.com
