@@ -35,11 +35,10 @@ class FeatureCalculator():
         support (or this will raise a ValueError).
 
         Args:
-            **kwargs: The names and values of the desired parameters to set.
+            **kwargs (dict): The names and values of the desired parameters to set.
 
-        Raises:
-            ValueError if any keyword argument does not exist among the existing attributes of
-            the object.
+        Raises ValueError if any keyword argument does not exist among the existing attributes of
+        the object.
         """
         if kwargs is None:
             return
@@ -78,9 +77,9 @@ class PandasStatCalculator(FeatureCalculator):
         """ Calculates the histogram for a given feature.
 
         Args:
-            column: Pandas column with the data
-            feature: Feature which holds the metadata
-            bins: (Only used for numerical features) If a number, the histogram will
+            column (pd.Series): Pandas column with the data
+            feature (Feature): Feature which holds the metadata
+            bins (Union[int, str, None]): (Only used for numerical features) If a number, the histogram will
                   have `bins` bins. If a string, it will use an automatic NumPy method for
                   estimating this number. See more about available methods here:
                   https://numpy.org/devdocs/reference/generated/numpy.histogram_bin_edges.html#numpy.histogram_bin_edges.

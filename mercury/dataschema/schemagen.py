@@ -102,15 +102,14 @@ class DataSchema:
             a later call to `calculate_statistics` could fail.
 
         Args:
-            dataframe: DataFrame on which the schema will be inferred.
-            categ_columns: list of columns which will be forced to be taken as categorical. Warning:
+            dataframe (pd.DataFrame): DataFrame on which the schema will be inferred.
+            categ_columns (List[str]): list of columns which will be forced to be taken as categorical. Warning:
                           all features not in this list are guaranteed not being categorical
-            discrete_columns: list of columns which will be forced to be taken as discrete. Warning:
+            discrete_columns (List[str]): list of columns which will be forced to be taken as discrete. Warning:
                           all features not in this list are guaranteed not to be taken as discrete (i.e.
                           they will be continuous).
-            binary_columns: list of column which will be forced to be taken as binary.
-            custom_stats: Custom statistics to be calculated for each column.
-            verbose: whether to show or filter all possible warning messages
+            binary_columns (List[str]): list of column which will be forced to be taken as binary.
+            custom_stats (Optional[Dict[str, Any]]): Custom statistics to be calculated for each column.
         """
         force_types = {}
         for col in dataframe.columns:
@@ -217,13 +216,12 @@ class DataSchema:
         """
         De-anonymize the selected features on a preloaded schema.
 
+        Raises UserWarning, if anonymize_params is empty.
+        Raises ValueError, if the feature selected to deanonymize is not binary or categorical, or is not a feature of the dataschema.
+
         Args:
             anonymize_params: Dictionary where the keys are the names of the columns to be deanonymized and the values
                               are mercury.contrib.dataschema.Anonymize objects that can be used to deanonymize them.
-
-        Raises:
-            UserWarning, if anonymize_params is empty.
-            ValueError, if the feature selected to deanonymize is not binary or categorical, or is not a feature of the dataschema.
         """
         if not anonymize_params:
             raise UserWarning("To De-anonymize, it is necessary to use a dictionary with the format: {'var1':anonym1, 'var2':anonym2}")
@@ -322,11 +320,10 @@ class DataSchema:
         """ Validates other schema with this one. The other schema will be considered
         valid if it shares the same feature names and datatypes with this.
 
+        Raises RuntimeError if other schema differs from this one
+
         Args:
             other: other schema to be checked from this one
-
-        Raises:
-            RuntimeError if other schema differs from this one
         """
         # Check feature names match
         if list(self.feats.keys()) != list(other.feats.keys()):
@@ -359,7 +356,7 @@ class DataSchema:
         """ Saves a JSON with the schema representation
 
         Args:
-            path: where the JSON will be saved.
+            path (str): where the JSON will be saved.
         """
         with open(path, 'w') as file:
             json.dump(self.to_json(), file)
