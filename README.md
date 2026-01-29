@@ -1,7 +1,7 @@
 # mercury-dataschema
 
 [![](https://github.com/BBVA/mercury-dataschema/actions/workflows/test.yml/badge.svg)](https://github.com/BBVA/mercury-dataschema)
-![](https://img.shields.io/badge/latest-1.1.2-blue)
+![](https://img.shields.io/badge/latest-1.2.0-blue)
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3816/)
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-3916/)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-31011/)
