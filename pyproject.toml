@@ -40,3 +40,6 @@ doc = [
 [project.urls]
 "Homepage" = "https://github.com/BBVA/mercury-dataschema"
 "Bug Tracker" = "https://github.com/BBVA/mercury-dataschema/issues"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
