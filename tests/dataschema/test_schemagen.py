@@ -350,3 +350,38 @@ def test_categorical_and_numerical_user_assignation():
     df['str_float_categorical'] = df['float_categorical'].astype(str)
     schema = DataSchema().generate(df, verbose=False)
     assert isinstance(schema.feats['str_float_categorical'], CategoricalFeature)
+
+
+def test_generate_rejects_pyspark_like_dataframe():
+    FakeSparkDataFrame = type('DataFrame', (), {})
+    FakeSparkDataFrame.__module__ = 'pyspark.sql'
+
+    with pytest.raises(RuntimeError, match='Pyspark is not supported yet'):
+        DataSchema().generate(FakeSparkDataFrame())
+
+
+def test_validate_detects_feature_type_mismatch():
+    dataframe = pd.DataFrame({'flag': [0, 1, 0, 1]})
+    original_schema = DataSchema().generate(dataframe, verbose=False)
+    forced_schema = DataSchema().generate(
+        dataframe,
+        force_types={'flag': FeatType.CATEGORICAL},
+        verbose=False,
+    )
+
+    with pytest.raises(RuntimeError, match='Feature types do not match'):
+        original_schema.validate(forced_schema)
+
+
+def test_deanonymize_integer_feature_casts_back_to_int():
+    dataframe = pd.DataFrame({'flag': [0, 1, 0, 1]})
+    schema = DataSchema().generate(dataframe, verbose=False).calculate_statistics()
+
+    anonymizer = Anonymize(0)
+    anonymizer.set_key('integer-key')
+
+    anonymized = schema.anonymize({'flag': anonymizer})
+    restored = anonymized.deanonymize({'flag': anonymizer})
+
+    assert all(isinstance(x, int) for x in restored.feats['flag'].stats['distribution_bins'])
+    assert all(isinstance(x, int) for x in restored.feats['flag'].stats['domain'])
