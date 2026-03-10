@@ -19,6 +19,8 @@ This package is used by other Mercury submodules, and you also can use it separa
 
 As an idea (there are plenty of them, though), it is particularly useful when preprocessing datasets. Having to specify the typical `categorical_cols` and `coninuous_cols` is over!
 
+![](./mercury/dataschema/tutorials/images/dataschema.png)
+
 ## Mercury project at BBVA
 
 Mercury is a collaborative library that was developed by the Advanced Analytics community at BBVA. Originally, it was created as an [InnerSource](https://en.wikipedia.org/wiki/Inner_source) project but after some time, we decided to release certain parts of the project as Open Source.
