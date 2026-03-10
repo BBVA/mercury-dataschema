@@ -37,7 +37,7 @@ def datasets():
 def test_dataschema_build(datasets):
     tips, titanic = datasets
 
-    schma = DataSchema().generate(tips)
+    schma = DataSchema().generate(tips, verbose=False)
 
     assert isinstance(schma.feats['sex'], BinaryFeature)
     assert isinstance(schma.feats['smoker'], BinaryFeature)
@@ -51,7 +51,7 @@ def test_dataschema_build(datasets):
     assert schma.feats['size'].name == 'size'
     assert schma.feats['total_bill'].name == 'total_bill'
 
-    schma = DataSchema().generate(titanic)
+    schma = DataSchema().generate(titanic, verbose=False)
     assert isinstance(schma.feats['deck'], CategoricalFeature)
     assert(schma.feats['deck'].stats['percent_nan'] > 0)
     assert(schma.feats['adult_male'].dtype == DataType.BOOL)
@@ -61,14 +61,14 @@ def test_dataschema_build(datasets):
 def test_dataschema_stats(datasets):
     tips, titanic = datasets
 
-    schma = DataSchema().generate(tips).calculate_statistics()
+    schma = DataSchema().generate(tips, verbose=False).calculate_statistics()
 
     assert schma.feats['tip'].stats['min'] == 1.0
     assert schma.feats['tip'].stats['max'] == 10.0
     assert schma.feats['tip'].stats['mean'] == pytest.approx(2.99827868852459)
     assert schma.feats['tip'].stats['percent_unique'] == pytest.approx(0.5040983606557377)
 
-    schma = DataSchema().generate(titanic).calculate_statistics()
+    schma = DataSchema().generate(titanic, verbose=False).calculate_statistics()
     assert schma.feats['sex'].stats['distribution_bins'][0] == 'female'
     assert schma.feats['sex'].stats['distribution_bins'][1] == 'male'
     assert schma.feats['sex'].stats['distribution'][0] == pytest.approx(0.35655738, 0.1)
@@ -76,13 +76,13 @@ def test_dataschema_stats(datasets):
 
 def test_dataschema_stats_custom_params(datasets):
     _, titanic = datasets
-    schma = DataSchema().generate(titanic).calculate_statistics()
+    schma = DataSchema().generate(titanic, verbose=False).calculate_statistics()
     assert len(schma.feats['age'].stats['distribution']) > 10
 
-    schma = DataSchema().generate(titanic).calculate_statistics({'distribution_bins_method': 5})
+    schma = DataSchema().generate(titanic, verbose=False).calculate_statistics({'distribution_bins_method': 5})
     assert len(schma.feats['age'].stats['distribution']) == 5
 
-    schma = DataSchema().generate(titanic).calculate_statistics({
+    schma = DataSchema().generate(titanic, verbose=False).calculate_statistics({
         'age': {'distribution_bins_method': 5},
         'fare': {'distribution_bins_method': 3}
     })
@@ -91,16 +91,16 @@ def test_dataschema_stats_custom_params(datasets):
 
     titanic = titanic.reset_index().rename(columns = {'index':'ID'})
     titanic["ID"] = titanic["ID"].astype(str)
-    schma = (DataSchema().generate(titanic).calculate_statistics({'limit_categorical_perc': 0.05}))
+    with pytest.warns(UserWarning, match="ID will be truncated"):
+        schma = (DataSchema().generate(titanic, verbose=False).calculate_statistics({'limit_categorical_perc': 0.05}))
     assert len(schma.feats['ID'].stats['domain']) == 44
 
     with pytest.raises(ValueError) as e:
-        schma = (DataSchema().generate(titanic).calculate_statistics({'limit_categorical_perc': 5}))
-        assert "Input Error: 'limit_categorical_perc' must be a float between 0 and 1" in str(e.value)
+        schma = (DataSchema().generate(titanic, verbose=False).calculate_statistics({'limit_categorical_perc': 5}))
 
 
 def test_dataschema_stats_anonymize(datasets, tmpdir):
-    
+
     _, titanic = datasets
     test_feat = "class"
 
@@ -122,37 +122,31 @@ def test_dataschema_stats_anonymize(datasets, tmpdir):
 def test_errors_dataschema_anonymize(datasets):
     tips, titanic = datasets
 
-    schma = DataSchema().generate(titanic)
+    schma = DataSchema().generate(titanic, verbose=False)
     with pytest.raises(UserWarning) as w:
         schma.anonymize({})
-        assert "To anonymise, it is necessary to use a dictionary with the format: {'var1':anonymizer1, 'var2':anonymizer2}" in str(w.value)
 
     an_encrypt = Anonymize(0)
     an_encrypt.set_key("07jaPY")
     with pytest.raises(ValueError) as e:
         schma.anonymize({'fare' : an_encrypt})
-        assert "Input Error: Anonymize only supports Categorical or Binary variables ->" in str(e.value)
 
     with pytest.raises(ValueError) as e:
         schma.anonymize({'farer' : an_encrypt})
-        assert "Input Error: Keys of 'anonymize_params' dictionary must be columns name of the data schema" in str(e.value)
 
     with pytest.raises(UserWarning) as w:
         schma.deanonymize({})
-        assert "To De-anonymise, it is necessary to use a dictionary with the format: {'var1':anonym1, 'var2':anonym2}"
 
     with pytest.raises(ValueError) as e:
         schma.deanonymize({'fare' : an_encrypt})
-        assert "Input Error: Deanonymize only supports Categorical or Binary variables ->" in str(e.value)
 
     with pytest.raises(ValueError) as e:
         schma.deanonymize({'farer' : an_encrypt})
-        assert "Input Error: Deanonymize only supports Categorical or Binary variables ->" in str(e.value)
 
 def test_dataschema_properties(datasets):
     tips, titanic = datasets
 
-    schma = DataSchema().generate(titanic)
+    schma = DataSchema().generate(titanic, verbose=False)
     assert ['pclass', 'sibsp', 'parch', 'embarked', 'class', 'who', 'deck', 'embark_town'] == schma.categorical_feats
     assert ['age', 'fare'] == schma.continuous_feats
     assert ['survived', 'sex', 'adult_male', 'alive', 'alone'] == schma.binary_feats
@@ -199,8 +193,8 @@ def test_validate(datasets):
     titanic2 = titanic.copy()
     titanic2['deck'] = 0
 
-    schma = DataSchema().generate(titanic)
-    schma2 = DataSchema().generate(titanic2)
+    schma = DataSchema().generate(titanic, verbose=False)
+    schma2 = DataSchema().generate(titanic2, verbose=False)
 
     with pytest.raises(RuntimeError) as exinfo:
         schma.validate(schma2)
@@ -208,7 +202,7 @@ def test_validate(datasets):
     assert "Data types types do not match. 'deck' in other is DataType.INTEGER. However, DataType.STRING is expected." in str(exinfo.value)
 
     titanic2 = titanic.drop('deck', axis=1)
-    schma2 = DataSchema().generate(titanic2)
+    schma2 = DataSchema().generate(titanic2, verbose=False)
 
     with pytest.raises(RuntimeError) as exinfo:
         schma.validate(schma2)
@@ -219,7 +213,7 @@ def test_validate(datasets):
 def test_serialization(datasets, tmpdir):
     tips, titanic = datasets
 
-    schma = DataSchema().generate(titanic).calculate_statistics()
+    schma = DataSchema().generate(titanic, verbose=False).calculate_statistics()
     path = str(tmpdir) + '/schema.json'
     schma.save(path)
     recovered = DataSchema.load(path)
@@ -231,7 +225,7 @@ def test_serialization(datasets, tmpdir):
 
 def test_get_features_by_type(datasets):
     tips, titanic = datasets
-    schema = DataSchema().generate(titanic)
+    schema = DataSchema().generate(titanic, verbose=False)
 
     str_feats = {'class', 'alive', 'deck', 'embark_town', 'embarked', 'sex', 'who'}
     float_feats = {'age', 'fare'}
@@ -253,7 +247,7 @@ def test_subtypes():
     df["uint_32"] = (df["float_64"] * 10000).astype(np.uint32)
     df["uint_16"] = (df["float_64"] * 10000).astype(np.uint16)
 
-    schema = DataSchema().generate(df)
+    schema = DataSchema().generate(df, verbose=False)
 
     assert all(elem in schema.continuous_feats  for elem in ['float', 'float_64', 'float_32', 'float_16'])
     assert all(elem in schema.discrete_feats  for elem in ['int_64', 'int_32', 'int_16'])
@@ -285,7 +279,7 @@ def test_pandas_categorical_type():
     df["categorical_int"] = df["categorical_int"].astype("category")
     df["categorical_str"] = df["categorical_str"].astype("category")
 
-    schema = DataSchema().generate(df)
+    schema = DataSchema().generate(df, verbose=False)
     assert all(elem in schema.categorical_feats  for elem in ['categorical_int', 'categorical_str'])
     assert isinstance(schema.feats['categorical_int'], CategoricalFeature)
     assert isinstance(schema.feats['categorical_str'], CategoricalFeature)
@@ -298,7 +292,7 @@ def test_float_conversions():
         'float_discrete': np.random.randint(0, 10000, size=1000).astype(float),
         'float_continous': np.random.uniform(0, 10000, size=1000)
     })
-    schema = DataSchema().generate(df)
+    schema = DataSchema().generate(df, verbose=False)
     assert isinstance(schema.feats['float_categorical'], CategoricalFeature)
     assert isinstance(schema.feats['float_discrete'], DiscreteFeature)
     assert isinstance(schema.feats['float_continous'], ContinuousFeature)
@@ -316,7 +310,7 @@ def test_categorical_and_numerical_user_assignation():
     })
 
     # Generate initially with automatic inference
-    schema = DataSchema().generate(df)
+    schema = DataSchema().generate(df, verbose=False)
     assert isinstance(schema.feats['float_categorical'], CategoricalFeature)
     assert isinstance(schema.feats['float_discrete'], DiscreteFeature)
     assert isinstance(schema.feats['float_continous'], ContinuousFeature)
@@ -354,6 +348,40 @@ def test_categorical_and_numerical_user_assignation():
 
     # String column as a numeric doesn't change it (raises warning)
     df['str_float_categorical'] = df['float_categorical'].astype(str)
-    schema = DataSchema().generate(df)
+    schema = DataSchema().generate(df, verbose=False)
     assert isinstance(schema.feats['str_float_categorical'], CategoricalFeature)
 
+
+def test_generate_rejects_pyspark_like_dataframe():
+    FakeSparkDataFrame = type('DataFrame', (), {})
+    FakeSparkDataFrame.__module__ = 'pyspark.sql'
+
+    with pytest.raises(RuntimeError, match='Pyspark is not supported yet'):
+        DataSchema().generate(FakeSparkDataFrame())
+
+
+def test_validate_detects_feature_type_mismatch():
+    dataframe = pd.DataFrame({'flag': [0, 1, 0, 1]})
+    original_schema = DataSchema().generate(dataframe, verbose=False)
+    forced_schema = DataSchema().generate(
+        dataframe,
+        force_types={'flag': FeatType.CATEGORICAL},
+        verbose=False,
+    )
+
+    with pytest.raises(RuntimeError, match='Feature types do not match'):
+        original_schema.validate(forced_schema)
+
+
+def test_deanonymize_integer_feature_casts_back_to_int():
+    dataframe = pd.DataFrame({'flag': [0, 1, 0, 1]})
+    schema = DataSchema().generate(dataframe, verbose=False).calculate_statistics()
+
+    anonymizer = Anonymize(0)
+    anonymizer.set_key('integer-key')
+
+    anonymized = schema.anonymize({'flag': anonymizer})
+    restored = anonymized.deanonymize({'flag': anonymizer})
+
+    assert all(isinstance(x, int) for x in restored.feats['flag'].stats['distribution_bins'])
+    assert all(isinstance(x, int) for x in restored.feats['flag'].stats['domain'])

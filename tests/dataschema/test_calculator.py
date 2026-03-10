@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 
 from mercury.dataschema.calculator import StatCalculatorFactory, PandasStatCalculator
-from mercury.dataschema.feature import Feature
+from mercury.dataschema.calculator import FeatureCalculator, SparkStatCalculator
+from mercury.dataschema.feature import ContinuousFeature, DataType, Feature
 
 
 @pytest.fixture(scope='module')
@@ -33,6 +34,7 @@ def test_calculator(pandas_df):
 
 def test_set_config(pandas_df):
     calculator = StatCalculatorFactory.build_calculator(pandas_df)
+
     with pytest.raises(ValueError):
         calculator.set_config(**{'nonexistingattr': 10})
 
@@ -42,3 +44,33 @@ def test_set_config(pandas_df):
 
     # Assert does nothing with None
     calculator.set_config()
+
+
+def test_feature_calculator_base_noops():
+    calculator = FeatureCalculator()
+    feature = Feature()
+
+    calculator._FeatureCalculator__init()
+    assert calculator.min([], feature) is None
+    assert calculator.max([], feature) is None
+    assert calculator.distribution([], feature) is None
+
+
+def test_distribution_cache_miss_and_spark_paths():
+    calculator = PandasStatCalculator()
+    feature = ContinuousFeature(name='value', dtype=DataType.FLOAT)
+    column = pd.Series([1.0, 2.0, np.nan, 3.0])
+
+    calculator.distribution(column, feature, bins=2)
+
+    assert 'no_nan_filtered' in feature.cache
+    assert len(feature.stats['distribution']) == 2
+
+    spark_calc = SparkStatCalculator()
+    assert isinstance(spark_calc, SparkStatCalculator)
+
+    FakeSparkDataFrame = type('DataFrame', (), {})
+    FakeSparkDataFrame.__module__ = 'pyspark.sql'
+
+    with pytest.raises(RuntimeError, match='Pyspark is not supported yet'):
+        StatCalculatorFactory.build_calculator(FakeSparkDataFrame())
