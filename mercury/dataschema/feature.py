@@ -233,19 +233,16 @@ class FeatureFactory:
 
         if column.dtype.name == 'category':
             datatype = DataType.CATEGORICAL
-        elif np.issubdtype(column, np.integer):
+        elif np.issubdtype(column.dtype, np.integer):
             datatype = DataType.INTEGER
-        elif np.issubdtype(column, np.bool_):
+        elif np.issubdtype(column.dtype, np.bool_):
             datatype = DataType.BOOL
-        elif np.issubdtype(column, np.floating):
+        elif np.issubdtype(column.dtype, np.floating):
             datatype = DataType.FLOAT
-        elif np.issubdtype(column, np.object_):
+        elif np.issubdtype(column.dtype, np.object_):
             sample = feature.cache['no_nan_filtered'].iloc[0]
             if type(sample) is str:
                 datatype = DataType.STRING
-            # TODO: Este tipo puede ser otro array
-            # TODO: Este tipo puede ser un json (dict)
-            # TODO: Este tipo puede ser un datetime
 
         return datatype
 
