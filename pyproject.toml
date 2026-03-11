@@ -19,13 +19,16 @@ classifiers = [
 ]
 dependencies = [
   'numpy',
-  'cryptography'
+  'cryptography',
+  'pytz',
+  'python-dateutil',
+  'seaborn',
 ]
 
 [project.optional-dependencies]
 dev = [
-  'seaborn',
   'pytest',
+  'pytest-asyncio',
   'flake8',
 ]
 doc = [
