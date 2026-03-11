@@ -78,3 +78,9 @@ def test_factory_warning_paths_for_float_and_int_to_categorical():
             verbose=True,
         )
     assert isinstance(int_feature, CategoricalFeature)
+
+
+if __name__ == "__main__":
+    test_feature_repr_enum_and_json()
+    test_specific_feature_classes_repr_enum_and_stats()
+    test_factory_warning_paths_for_float_and_int_to_categorical()

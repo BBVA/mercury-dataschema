@@ -90,3 +90,8 @@ def test_anonymize_list_any_type_casts_non_str_items():
     cast_values = [str(v) for v in mixed_values]
 
     assert anonymizer.anonymize_list_any_type(mixed_values) == anonymizer.anonymize_list(cast_values)
+
+
+if __name__ == "__main__":
+    test_anonymize()
+    test_anonymize_list_any_type_casts_non_str_items()

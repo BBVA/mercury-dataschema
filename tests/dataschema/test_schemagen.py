@@ -1,4 +1,4 @@
-import pytest
+import pytest, os
 
 import seaborn as sns
 import pandas as pd
@@ -16,8 +16,7 @@ from mercury.dataschema.feature import DataType, FeatType
 from mercury.dataschema.anonymize import Anonymize
 
 
-@pytest.fixture(scope='module')
-def datasets():
+def sns_datasets():
     tips = sns.load_dataset('tips')
     tips['sex'] = tips['sex'].astype(str)
     tips['smoker'] = tips['smoker'].astype(str)
@@ -34,7 +33,7 @@ def datasets():
     return tips, titanic
 
 
-def test_dataschema_build(datasets):
+def test_dataschema_build(datasets = sns_datasets()):
     tips, titanic = datasets
 
     schma = DataSchema().generate(tips, verbose=False)
@@ -58,7 +57,7 @@ def test_dataschema_build(datasets):
     assert schma.feats['adult_male'].name == 'adult_male'
 
 
-def test_dataschema_stats(datasets):
+def test_dataschema_stats(datasets = sns_datasets()):
     tips, titanic = datasets
 
     schma = DataSchema().generate(tips, verbose=False).calculate_statistics()
@@ -74,7 +73,7 @@ def test_dataschema_stats(datasets):
     assert schma.feats['sex'].stats['distribution'][0] == pytest.approx(0.35655738, 0.1)
 
 
-def test_dataschema_stats_custom_params(datasets):
+def test_dataschema_stats_custom_params(datasets = sns_datasets()):
     _, titanic = datasets
     schma = DataSchema().generate(titanic, verbose=False).calculate_statistics()
     assert len(schma.feats['age'].stats['distribution']) > 10
@@ -99,7 +98,7 @@ def test_dataschema_stats_custom_params(datasets):
         schma = (DataSchema().generate(titanic, verbose=False).calculate_statistics({'limit_categorical_perc': 5}))
 
 
-def test_dataschema_stats_anonymize(datasets, tmpdir):
+def test_dataschema_stats_anonymize(datasets  = sns_datasets()):
 
     _, titanic = datasets
     test_feat = "class"
@@ -119,7 +118,7 @@ def test_dataschema_stats_anonymize(datasets, tmpdir):
     assert 'First' not in an_dist_bins and 'Second' not in an_dist_bins and 'Third' not in an_dist_bins
 
 
-def test_errors_dataschema_anonymize(datasets):
+def test_errors_dataschema_anonymize(datasets = sns_datasets()):
     tips, titanic = datasets
 
     schma = DataSchema().generate(titanic, verbose=False)
@@ -143,7 +142,8 @@ def test_errors_dataschema_anonymize(datasets):
     with pytest.raises(ValueError) as e:
         schma.deanonymize({'farer' : an_encrypt})
 
-def test_dataschema_properties(datasets):
+
+def test_dataschema_properties(datasets = sns_datasets()):
     tips, titanic = datasets
 
     schma = DataSchema().generate(titanic, verbose=False)
@@ -153,7 +153,7 @@ def test_dataschema_properties(datasets):
     assert len(schma.discrete_feats) == 0
 
 
-def test_generate_manual(datasets):
+def test_generate_manual(datasets = sns_datasets()):
     tips, titanic = datasets
     schma = DataSchema().generate_manual(
         titanic,
@@ -187,7 +187,7 @@ def test_generate_manual(datasets):
         assert isinstance(item, ContinuousFeature)
 
 
-def test_validate(datasets):
+def test_validate(datasets = sns_datasets()):
     tips, titanic = datasets
 
     titanic2 = titanic.copy()
@@ -210,20 +210,22 @@ def test_validate(datasets):
     assert "Features do not match." in str(exinfo.value)
 
 
-def test_serialization(datasets, tmpdir):
+def test_serialization(datasets = sns_datasets()):
     tips, titanic = datasets
 
     schma = DataSchema().generate(titanic, verbose=False).calculate_statistics()
-    path = str(tmpdir) + '/schema.json'
+    path = './schema.json'
     schma.save(path)
     recovered = DataSchema.load(path)
+
+    os.remove(path)
 
     # If any of this fail, the serialization is wrong
     schma.validate(recovered)
     recovered.validate(schma)
 
 
-def test_get_features_by_type(datasets):
+def test_get_features_by_type(datasets = sns_datasets()):
     tips, titanic = datasets
     schema = DataSchema().generate(titanic, verbose=False)
 
@@ -290,12 +292,12 @@ def test_float_conversions():
     df = pd.DataFrame(data={
         'float_categorical': np.random.choice([0., 1., 2.], size=1000),
         'float_discrete': np.random.randint(0, 10000, size=1000).astype(float),
-        'float_continous': np.random.uniform(0, 10000, size=1000)
+        'float_continuous': np.random.uniform(0, 10000, size=1000)
     })
     schema = DataSchema().generate(df, verbose=False)
     assert isinstance(schema.feats['float_categorical'], CategoricalFeature)
     assert isinstance(schema.feats['float_discrete'], DiscreteFeature)
-    assert isinstance(schema.feats['float_continous'], ContinuousFeature)
+    assert isinstance(schema.feats['float_continuous'], ContinuousFeature)
 
 
 def test_categorical_and_numerical_user_assignation():
@@ -304,7 +306,7 @@ def test_categorical_and_numerical_user_assignation():
     df = pd.DataFrame(data={
         'float_categorical': np.random.choice([0., 1., 2.], size=1000),
         'float_discrete': np.random.randint(0, 10000, size=1000).astype(float),
-        'float_continous': np.random.uniform(0, 10000, size=1000),
+        'float_continuous': np.random.uniform(0, 10000, size=1000),
         'int_categorical': np.random.choice([0, 1, 2], size=1000),
         'int_discrete': np.random.randint(0, 10000, size=1000)
     })
@@ -313,12 +315,12 @@ def test_categorical_and_numerical_user_assignation():
     schema = DataSchema().generate(df, verbose=False)
     assert isinstance(schema.feats['float_categorical'], CategoricalFeature)
     assert isinstance(schema.feats['float_discrete'], DiscreteFeature)
-    assert isinstance(schema.feats['float_continous'], ContinuousFeature)
+    assert isinstance(schema.feats['float_continuous'], ContinuousFeature)
     assert isinstance(schema.feats['int_categorical'], CategoricalFeature)
     assert isinstance(schema.feats['int_discrete'], DiscreteFeature)
 
     # Generate now with manual assignation of data datatypes
-    cat_feats = ['float_discrete', 'float_continous', 'int_discrete']
+    cat_feats = ['float_discrete', 'float_continuous', 'int_discrete']
     num_feats = ['float_categorical', 'int_categorical']
     schema = DataSchema().generate(
         df,
@@ -326,7 +328,7 @@ def test_categorical_and_numerical_user_assignation():
     )
     # assert isinstance(schema.feats['float_categorical'], DiscreteFeature)
     # assert isinstance(schema.feats['float_discrete'], CategoricalFeature)
-    # assert isinstance(schema.feats['float_continous'], CategoricalFeature)
+    # assert isinstance(schema.feats['float_continuous'], CategoricalFeature)
     # assert isinstance(schema.feats['int_categorical'], DiscreteFeature)
     # assert isinstance(schema.feats['int_discrete'], CategoricalFeature)
     #
@@ -334,11 +336,11 @@ def test_categorical_and_numerical_user_assignation():
     # schema = DataSchema().generate(
     #     df,
     #     cat_feats=['float_categorical', 'int_categorical'],
-    #     num_feats=['int_discrete', 'float_discrete', 'float_continous']
+    #     num_feats=['int_discrete', 'float_discrete', 'float_continuous']
     # )
     # assert isinstance(schema.feats['float_categorical'], CategoricalFeature)
     # assert isinstance(schema.feats['float_discrete'], DiscreteFeature)
-    # assert isinstance(schema.feats['float_continous'], ContinuousFeature)
+    # assert isinstance(schema.feats['float_continuous'], ContinuousFeature)
     # assert isinstance(schema.feats['int_categorical'], CategoricalFeature)
     # assert isinstance(schema.feats['int_discrete'], DiscreteFeature)
 
@@ -385,3 +387,23 @@ def test_deanonymize_integer_feature_casts_back_to_int():
 
     assert all(isinstance(x, int) for x in restored.feats['flag'].stats['distribution_bins'])
     assert all(isinstance(x, int) for x in restored.feats['flag'].stats['domain'])
+
+
+if __name__ == "__main__":
+    test_dataschema_build()
+    test_dataschema_stats()
+    test_dataschema_stats_custom_params()
+    test_dataschema_stats_anonymize()
+    test_errors_dataschema_anonymize()
+    test_dataschema_properties()
+    test_generate_manual()
+    test_validate()
+    test_serialization()
+    test_get_features_by_type()
+    test_subtypes()
+    test_pandas_categorical_type()
+    test_float_conversions()
+    test_categorical_and_numerical_user_assignation()
+    test_generate_rejects_pyspark_like_dataframe()
+    test_validate_detects_feature_type_mismatch()
+    test_deanonymize_integer_feature_casts_back_to_int()
