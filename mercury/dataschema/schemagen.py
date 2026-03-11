@@ -83,6 +83,7 @@ class DataSchema:
         self._feat_factory = None
         self._generated = False
 
+
     def generate_manual(
         self,
         dataframe: Union["pandas.DataFrame", "pyspark.sql.DataFrame"],  # noqa: F821
