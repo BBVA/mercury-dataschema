@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mercury-dataschema"
 license = {file = "LICENSE.txt"}
-version = "1.1.2"
+version = "1.2.0"
 authors = [
   { name="Mercury Team", email="mercury.group@bbva.com" },
 ]
@@ -19,13 +19,16 @@ classifiers = [
 ]
 dependencies = [
   'numpy',
-  'cryptography'
+  'cryptography',
+  'pytz',
+  'python-dateutil',
+  'seaborn',
 ]
 
 [project.optional-dependencies]
 dev = [
-  'seaborn',
   'pytest',
+  'pytest-asyncio',
   'flake8',
 ]
 doc = [
@@ -40,3 +43,6 @@ doc = [
 [project.urls]
 "Homepage" = "https://github.com/BBVA/mercury-dataschema"
 "Bug Tracker" = "https://github.com/BBVA/mercury-dataschema/issues"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"

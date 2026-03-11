@@ -1,8 +1,7 @@
 # mercury-dataschema
 
 [![](https://github.com/BBVA/mercury-dataschema/actions/workflows/test.yml/badge.svg)](https://github.com/BBVA/mercury-dataschema)
-![](https://img.shields.io/badge/latest-1.1.2-blue)
-[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3816/)
+![](https://img.shields.io/badge/latest-1.2.0-blue)
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-3916/)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-31011/)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3119/)
@@ -18,6 +17,8 @@ This type inference isn't solely based on data types but in the information the 
 This package is used by other Mercury submodules, and you also can use it separately from the rest of the library.
 
 As an idea (there are plenty of them, though), it is particularly useful when preprocessing datasets. Having to specify the typical `categorical_cols` and `coninuous_cols` is over!
+
+![](./mercury/dataschema/tutorials/images/dataschema.png)
 
 ## Mercury project at BBVA
 

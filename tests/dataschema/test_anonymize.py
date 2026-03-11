@@ -80,3 +80,18 @@ def test_anonymize():
     cp_bm1 = bm1.anonymize_list(pl)
 
     assert cp_am1 == cp_bm1
+
+
+def test_anonymize_list_any_type_casts_non_str_items():
+    anonymizer = Anonymize(96)
+    anonymizer.set_key('shared-key')
+
+    mixed_values = ['1', 2, 3.0, True]
+    cast_values = [str(v) for v in mixed_values]
+
+    assert anonymizer.anonymize_list_any_type(mixed_values) == anonymizer.anonymize_list(cast_values)
+
+
+if __name__ == "__main__":
+    test_anonymize()
+    test_anonymize_list_any_type_casts_non_str_items()

@@ -40,7 +40,7 @@ class FeatureCalculator():
         Raises ValueError if any keyword argument does not exist among the existing attributes of
         the object.
         """
-        if kwargs is None:
+        if not kwargs:
             return
 
         for key, val in kwargs.items():
