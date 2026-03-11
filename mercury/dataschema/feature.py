@@ -1,7 +1,13 @@
 from enum import Enum
+from packaging.version import Version
 
+from pandas.api.types import is_integer_dtype, is_bool_dtype, is_float_dtype, is_string_dtype
+
+import pandas as pd
 import numpy as np
 import warnings
+
+from mercury.dataschema import feature
 
 
 class DataType(Enum):
@@ -52,18 +58,23 @@ class Feature:
 
         return self
 
+
     def __str__(self):
         return f"Feature (NAME={self.name}, dtype={self.dtype})"
+
 
     def __repr__(self):
         return self.__str__()
 
+
     def _get_enum_feat_type(self):
         return FeatType.UNKNOWN
+
 
     @property
     def as_enum(self):
         return self._get_enum_feat_type()
+
 
     def to_json(self) -> dict:
         stats_serialized = self.stats.copy()
@@ -87,9 +98,9 @@ class BinaryFeature(Feature):
         name (str): Feature name
         dtype (str): Data type of the feature
     """
-    def __init__(self, name = None, dtype = None                 ):
-
+    def __init__(self, name = None, dtype = None):
         super().__init__(name, dtype)
+
 
     def build_stats(self, column, calculator):
         super().build_stats(column, calculator)
@@ -97,11 +108,14 @@ class BinaryFeature(Feature):
         calculator.distribution(column, self, bins = 2)
         return self
 
+
     def __str__(self):
         return f"Binary Feature (NAME={self.name}, dtype={self.dtype})"
 
+
     def __repr__(self):
         return self.__str__()
+
 
     def _get_enum_feat_type(self):
         return FeatType.BINARY
@@ -116,8 +130,8 @@ class CategoricalFeature(Feature):
         dtype (str): Data type of the feature
     """
     def __init__(self, name = None, dtype = None):
-
         super().__init__(name, dtype)
+
 
     def build_stats(self, column, calculator):
         super().build_stats(column, calculator)
@@ -143,11 +157,14 @@ class CategoricalFeature(Feature):
 
         return self
 
+
     def __str__(self):
         return f"Categorical Feature (NAME={self.name}, dtype={self.dtype})"
 
+
     def __repr__(self):
         return self.__str__()
+
 
     def _get_enum_feat_type(self):
         return FeatType.CATEGORICAL
@@ -162,8 +179,8 @@ class DiscreteFeature(Feature):
         dtype (str): Data type of the feature
     """
     def __init__(self, name = None, dtype = None):
-
         super().__init__(name, dtype)
+
 
     def build_stats(self, column, calculator):
         super().build_stats(column, calculator)
@@ -172,11 +189,14 @@ class DiscreteFeature(Feature):
         calculator.distribution(column, self)
         return self
 
+
     def __str__(self):
         return f"Discrete Feature (NAME={self.name}, dtype={self.dtype})"
 
+
     def __repr__(self):
         return self.__str__()
+
 
     def _get_enum_feat_type(self):
         return FeatType.DISCRETE
@@ -194,6 +214,7 @@ class ContinuousFeature(Feature):
 
         super().__init__(name, dtype)
 
+
     def build_stats(self, column, calculator):
         super().build_stats(column, calculator)
         calculator.min(column, self)
@@ -203,11 +224,14 @@ class ContinuousFeature(Feature):
         calculator.distribution(column, self)
         return self
 
+
     def __str__(self):
         return f"Continuous Feature (NAME={self.name}, dtype={self.dtype})"
 
+
     def __repr__(self):
         return self.__str__()
+
 
     def _get_enum_feat_type(self):
         return FeatType.CONTINUOUS
@@ -216,7 +240,8 @@ class ContinuousFeature(Feature):
 class FeatureFactory:
 
     def __init__(self):
-        pass
+        self.pandas3 = Version(pd.__version__) >= Version('3.0')
+
 
     def infer_datatype(self, column: "pandas.Series", feature: Feature) -> DataType:  # noqa: F821
         """ Finds out the data type of the column.
@@ -231,23 +256,33 @@ class FeatureFactory:
         """
         datatype = DataType.UNKNOWN
 
-        if column.dtype.name == 'category':
-            datatype = DataType.CATEGORICAL
-        elif np.issubdtype(column, np.integer):
-            datatype = DataType.INTEGER
-        elif np.issubdtype(column, np.bool_):
-            datatype = DataType.BOOL
-        elif np.issubdtype(column, np.floating):
-            datatype = DataType.FLOAT
-        elif np.issubdtype(column, np.object_):
-            sample = feature.cache['no_nan_filtered'].iloc[0]
-            if type(sample) is str:
+        if self.pandas3:
+            if isinstance(column.dtype, pd.CategoricalDtype):
+                datatype = DataType.CATEGORICAL
+            elif is_integer_dtype(column):
+                datatype = DataType.INTEGER
+            elif is_bool_dtype(column):
+                datatype = DataType.BOOL
+            elif is_float_dtype(column):
+                datatype = DataType.FLOAT
+            elif is_string_dtype(column):
                 datatype = DataType.STRING
-            # TODO: Este tipo puede ser otro array
-            # TODO: Este tipo puede ser un json (dict)
-            # TODO: Este tipo puede ser un datetime
+        else:
+            if column.dtype.name == 'category':
+                datatype = DataType.CATEGORICAL
+            elif np.issubdtype(column.dtype, np.integer):
+                datatype = DataType.INTEGER
+            elif np.issubdtype(column.dtype, np.bool_):
+                datatype = DataType.BOOL
+            elif np.issubdtype(column.dtype, np.floating):
+                datatype = DataType.FLOAT
+            elif np.issubdtype(column.dtype, np.object_):
+                sample = feature.cache['no_nan_filtered'].iloc[0]
+                if type(sample) is str:
+                    datatype = DataType.STRING
 
         return datatype
+
 
     def _build_dummy_feature(self, datatype: DataType, feat_type: FeatType, name: str) -> Feature:
         """ Returns a dummy and uninitialized feature. This method is not intended to be
@@ -286,6 +321,7 @@ class FeatureFactory:
         # codified as floats with decimals
         return FeatType.CONTINUOUS
 
+
     def _infer_feature_type_from_int(self, feat, threshold_categorical, colname, verbose = False):
         if feat.stats['percent_unique'] >= threshold_categorical:
             return FeatType.DISCRETE
@@ -297,6 +333,7 @@ class FeatureFactory:
                     RuntimeWarning
                 )
             return FeatType.CATEGORICAL
+
 
     def build_feature(self,
                       column: 'pandas.Series',  # noqa: F821
